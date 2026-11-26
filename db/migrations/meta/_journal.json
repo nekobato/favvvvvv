@@ -1,0 +1,62 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1795164510371,
+      "tag": "20261120084830_supreme_loki",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1795165477259,
+      "tag": "20261120090437_audit_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1795171117348,
+      "tag": "20261120103837_bookmark_url_index",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1795220234655,
+      "tag": "20261121001714_bookmark_groups",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1795346254396,
+      "tag": "20261122111734_bookmark_collections",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1795592686673,
+      "tag": "20261125074446_dashboard_sort_order",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1795668473005,
+      "tag": "20261126044753_bookmark_previews",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1795673900879,
+      "tag": "20261126061820_dashboard_sections",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "extends": "./.void/tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": [
+      "void/env"
+    ]
+  },
+  "include": [
+    "auth.ts",
+    "env.ts",
+    "vite.config.ts",
+    "void.config.ts",
+    "server",
+    "shared",
+    "client",
+    "pages",
+    "routes",
+    "db",
+    "workers"
+  ]
+}

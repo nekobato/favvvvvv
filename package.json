@@ -1,0 +1,29 @@
+{
+  "name": "favvvvvv",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^24.22.0 || >=26.12.0"
+  },
+  "devDependencies": {
+    "void": "1.11.0",
+    "vite": "^8.0.10",
+    "typescript": "^7.0.2",
+    "@void/vue": "1.11.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "void prepare && tsc --noEmit",
+    "postinstall": "void prepare"
+  },
+  "dependencies": {
+    "@dnd-kit/collision": "^0.5.3",
+    "@dnd-kit/vue": "^0.5.3",
+    "better-auth": "1.7.26",
+    "hono": "^4.11.9",
+    "vue": "^3.5.30",
+    "zod": "^4.6.7"
+  }
+}
