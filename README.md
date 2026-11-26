@@ -77,11 +77,25 @@ npm run build
 
 外部サイトへの取得リクエストには Cloudflare が `CF-Worker` を付けます。取得専用 Worker を経由した場合に、favvvvvv の公開ホスト名とゾーン名が受信側に現れないことを検証してから有効にします。 [Cloudflare の `CF-Worker` ヘッダー](https://developers.cloudflare.com/fundamentals/reference/http-headers/#cf-worker)
 
-### Void CLI で本体をデプロイする
+### 本体 Worker をデプロイする
 
-設置者の Cloudflare アカウントを選択してデプロイします。初回デプロイ時に Void が D1 を作成し、`db/migrations/` のマイグレーションを適用します。 [Void の Cloudflare デプロイ](https://void.cloud/integrations/cloudflare)
+[![favvvvvv 本体をデプロイ](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/nekobato/favvvvvv)
+
+Cloudflare のセットアップで本体の Worker と専用の D1 データベースを作成します。ビルドコマンドに `npm run build`、デプロイコマンドに `npx wrangler deploy` を使用します。 [Deploy to Cloudflare の仕様](https://developers.cloudflare.com/workers/platform/deploy-buttons/)
+
+デプロイ後、Cloudflare が作成したリポジトリを clone し、そのディレクトリで D1 のマイグレーションを適用します。 [Cloudflare の D1 マイグレーション](https://developers.cloudflare.com/d1/wrangler-commands/#d1-migrations-apply)
 
 ```sh
+npx wrangler login
+npx wrangler d1 migrations apply DB --remote
+```
+
+### Void CLI で本体をデプロイする
+
+Void CLI 用の作業コピーでは、Git の sparse checkout でボタン用の `wrangler.toml` を除外します。初回デプロイ時に Void が D1 を作成し、`db/migrations/` のマイグレーションを適用します。 [Void の Cloudflare デプロイ](https://void.cloud/integrations/cloudflare)
+
+```sh
+git sparse-checkout set --no-cone '/*' '!/wrangler.toml'
 npm ci
 npm exec -- void connect --platform cloudflare
 npm exec -- void deploy --platform cloudflare
@@ -89,7 +103,13 @@ npm exec -- void deploy --platform cloudflare
 
 Void は設置先に対応する Cloudflare アカウントと D1 の識別子を `void.lock.json` に記録します。同じ設置先を更新する際に使うため、このファイルは設置先ごとに保管します。
 
-デプロイ結果の URL に `/api/auth/callback/google` を加えた URI を、設置先用の Google OAuth クライアントに登録します。ログインを有効にするには、次の値を Worker のシークレットに設定します。入力内容はプロンプトで指定します。 [Void のシークレット設定](https://void.cloud/reference/cli/secrets)
+### Google ログインを設定する
+
+デプロイ結果の URL に `/api/auth/callback/google` を加えた URI を、設置先用の Google OAuth クライアントに登録します。`AUTH_GOOGLE_CLIENT_ID`、`AUTH_GOOGLE_CLIENT_SECRET`、`FAVVVVVV_ALLOWED_EMAILS` は、Cloudflare の本体 Worker の「Settings」→「Variables and Secrets」で設定できます。 [Cloudflare のシークレット設定](https://developers.cloudflare.com/workers/configuration/secrets/)
+
+本体をボタンでデプロイした場合は、同じ画面のシークレットに `BETTER_AUTH_SECRET` も追加し、`openssl rand -hex 32` で生成した値を設定します。
+
+Void CLI で管理している場合は、次のコマンドでも設定できます。入力内容はプロンプトで指定します。 [Void のシークレット設定](https://void.cloud/reference/cli/secrets)
 
 ```sh
 npm exec -- void secret put AUTH_GOOGLE_CLIENT_ID
@@ -105,7 +125,18 @@ npm exec -- void secret put FAVVVVVV_ALLOWED_EMAILS
 
 [![取得専用 Worker をデプロイ](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/nekobato/favvvvvv/tree/main/workers/metadata)
 
-次に、本体の `void.config.ts` に以下の Service Binding と環境変数を追加します。`service` には取得専用 Worker のデプロイ名を指定します。 [Void の Cloudflare バインディング設定](https://void.cloud/integrations/cloudflare)
+本体をボタンでデプロイした場合は、Cloudflare が作成した本体リポジトリの `wrangler.toml` に次の設定を追加して再デプロイします。`service` には取得専用 Worker のデプロイ名を指定します。
+
+```toml
+[vars]
+FAVVVVVV_METADATA_MODE = "binding"
+
+[[services]]
+binding = "METADATA_FETCHER"
+service = "favvvvvv-metadata"
+```
+
+本体を Void CLI でデプロイした場合は、`void.config.ts` の `cloudflare` に Service Binding と環境変数を設定して再デプロイします。 [Void の Cloudflare バインディング設定](https://void.cloud/integrations/cloudflare)
 
 ```ts
 cloudflare: {

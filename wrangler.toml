@@ -1,0 +1,22 @@
+# Deploy to Cloudflare uses the output of npm run build.
+name = "favvvvvv"
+main = "dist/ssr/index.js"
+compatibility_date = "2026-11-20"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+no_bundle = true
+
+[assets]
+directory = "dist/client"
+binding = "ASSETS"
+run_worker_first = ["/**"]
+
+[[rules]]
+type = "ESModule"
+globs = ["**/*.js", "**/*.mjs"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "favvvvvv-db"
+# The deploy dialog replaces this placeholder with the selected database ID.
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "db/migrations"
