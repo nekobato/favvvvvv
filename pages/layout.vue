@@ -146,6 +146,7 @@ a {
 }
 
 .button.type-primary:hover:not(:disabled) {
+  color: var(--on-accent);
   background: var(--accent-hover);
 }
 

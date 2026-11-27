@@ -26,7 +26,7 @@ Dashboard 上部の「グループを追加」から、Dashboard 直下にグル
 
 ## ブラウザからのインポート
 
-Chrome のブックマーク マネージャや Firefox のブックマーク管理画面から HTML 形式でエクスポートします。favvvvvv の一覧で「インポート」を選択し、最大 50 MB の HTML ファイルを指定します。 [Chrome のエクスポート手順](https://support.google.com/chrome/answer/96816) · [Firefox のエクスポート手順](https://support.mozilla.org/en-US/kb/export-firefox-bookmarks-to-backup-or-transfer)
+Chrome のブックマーク マネージャや Firefox のブックマーク管理画面から HTML 形式でエクスポートします。Dashboard で「編集」を選択し、「インポート」から最大 50 MB の HTML ファイルを指定します。 [Chrome のエクスポート手順](https://support.google.com/chrome/answer/96816) · [Firefox のエクスポート手順](https://support.mozilla.org/en-US/kb/export-firefox-bookmarks-to-backup-or-transfer)
 
 フォルダー内の項目も現在の一覧に追加されます。対象は HTTP と HTTPS の URL です。同じアカウントの登録済み URL と、ファイル内の重複はスキップし、追加・重複・対象外の件数を表示します。途中で中断した場合は、同じファイルで再試行できます。追加した各ブックマークは、登録として監査ログに記録されます。
 

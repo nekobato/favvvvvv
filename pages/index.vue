@@ -58,7 +58,7 @@ const bulkError = ref("");
 const reorderPending = ref(false);
 const editingPending = computed(() => bulkPending.value || reorderPending.value);
 const reorderDialogError = ref("");
-const dragTitle = ref("");
+const dragSource = shallowRef<ReorderSource>();
 const reorderSensors = [PointerSensor];
 const sides = ["before", "after"] as const;
 
@@ -76,7 +76,8 @@ const visibleSections = computed(() => {
 });
 const showUngrouped = computed(() => !props.query || props.ungrouped.total > 0);
 const canReorderGroups = computed(() => sections.value.length > 0 || props.rootGroups.length > 1);
-const showRootTarget = computed(() => editing.value && visibleSections.value.some(section => section.groups.length > 0));
+const showRootTarget = computed(() => editing.value && dragSource.value?.kind === "group"
+  && visibleSections.value.some(section => section.groups.length > 0));
 const destinations = computed<BookmarkDestination[]>(() => [
   { ...props.ungrouped.location, label: "グループなし" },
   ...props.rootGroups.map(group => ({ ...group.bookmarks.location, label: group.label })),
@@ -113,6 +114,7 @@ const removalForm = computed(() => removalForms[removalKind.value]);
 
 watch(() => props.userId, () => {
   editing.value = false;
+  dragSource.value = undefined;
   selectedIds.value.clear();
   bulkDialog.value?.close();
   reorderDialog.value?.close();
@@ -127,7 +129,10 @@ onBeforeUnmount(() => titleLookup.value?.abort());
 function toggleEditing() {
   if (editingPending.value) return;
   editing.value = !editing.value;
-  if (!editing.value) selectedIds.value.clear();
+  if (!editing.value) {
+    dragSource.value = undefined;
+    selectedIds.value.clear();
+  }
 }
 
 function selectBookmark(id: string, checked: boolean) {
@@ -198,11 +203,11 @@ function chooseOrder(source: ReorderSource) {
 }
 
 function startDrag({ operation }: DragStartEvent) {
-  dragTitle.value = (operation.source?.data.source as ReorderSource | undefined)?.title ?? "";
+  dragSource.value = operation.source?.data.source as ReorderSource | undefined;
 }
 
 function finishDrag({ canceled, operation }: DragEndEvent) {
-  dragTitle.value = "";
+  dragSource.value = undefined;
   if (canceled) return;
   const source = operation.source?.data.source as ReorderSource | undefined;
   const target = operation.target?.data.target as ReorderTarget | undefined;
@@ -384,7 +389,7 @@ async function removeSelection() {
   <main class="workspace">
     <h1 class="sr-only">Dashboard</h1>
     <div class="actions" role="group" aria-label="Dashboardの操作">
-      <BookmarkImportDialog :user-id="props.userId" @imported="toast?.show($event)" />
+      <BookmarkImportDialog v-if="editing" :user-id="props.userId" @imported="toast?.show($event)" />
       <div class="action-icons">
         <button
           class="button size-icon" type="button" aria-label="検索" title="検索"
@@ -407,8 +412,12 @@ async function removeSelection() {
           <ActionIcon name="dashboardAdd" />
         </button>
       </div>
-      <button ref="newButton" class="button" :class="editing ? 'type-plain' : 'type-primary'" type="button" @click="openEditor()">
-        <ActionIcon name="add" />新規登録
+      <button
+        ref="newButton" class="button size-icon" :class="{ 'type-primary': !editing }" type="button"
+        aria-label="新規登録" title="新規登録" aria-haspopup="dialog" aria-controls="bookmark-editor-dialog"
+        @click="openEditor()"
+      >
+        <ActionIcon name="add" />
       </button>
       <button
         ref="modeButton" class="button" :class="editing ? 'type-primary' : 'type-plain'" type="button"
@@ -544,7 +553,7 @@ async function removeSelection() {
         />
       </section>
       <DragOverlay :drop-animation="null">
-        <div class="drag-preview" aria-hidden="true">{{ dragTitle }}</div>
+        <div class="drag-preview" aria-hidden="true">{{ dragSource?.title }}</div>
       </DragOverlay>
     </DragDropProvider>
   </main>
@@ -567,7 +576,7 @@ async function removeSelection() {
   />
 
   <dialog
-    ref="editor" class="dialog" aria-labelledby="editor-title"
+    id="bookmark-editor-dialog" ref="editor" class="dialog" aria-labelledby="editor-title"
     @cancel="saveForm.pending && $event.preventDefault()" @close="!editor?.open && resetTitleLookup()"
   >
     <h2 id="editor-title">{{ saveForm.data.id ? "ブックマークを編集" : "ブックマークを登録" }}</h2>
